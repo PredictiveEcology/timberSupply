@@ -1,5 +1,5 @@
 ## Functions that query the BC Data Catalogue or download BC's THLB. Online only, never on
-## CRAN. thlbOfficialBC() and thlbBC() download THLB geodatabases, so they are also skipped on CI.
+## CRAN. The THLB test downloads one TSA geodatabase (tsa23.zip, about 4 MB; ~15 s locally).
 
 skipUnlessBC <- function() {
   skipUnlessOnline("openmaps.gov.bc.ca")
@@ -45,7 +45,6 @@ test_that("harvestConstraintsBC gives one layer per constraint on the grid", {
 })
 
 test_that("thlbOfficialBC and thlbBC: a THLB of 1/NA on the grid", {
-  skip_on_ci()
   skipUnlessBC()
   skip_if_offline("www.for.gov.bc.ca")
   rtm <- bcStudyArea()

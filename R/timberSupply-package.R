@@ -2,9 +2,10 @@
 "_PACKAGE"
 
 #' @importFrom data.table := .I as.data.table copy data.table rbindlist
+#' @importFrom utils globalVariables
 NULL
 
-utils::globalVariables(c(
+globalVariables(c(
   ".", ".rowID", "age", "B", "biomass", "canfi_species", "ecozone", "i.ecozone", "i.juris_id",
   "juris_id", "maxB", "merchODT", "pixelGroup", "pixelIndex", "planningArea", "speciesCode"
 ))
