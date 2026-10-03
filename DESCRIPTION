@@ -1,0 +1,18 @@
+Package: timberSupply
+Type: Package
+Title: Timber Supply on LandR Landscapes
+Description: Tools for the questions a Timber Supply Review asks of a LandR
+    forest landscape: where harvest can happen (timber harvesting land base and
+    harvest constraints), how long between cuts (rotation age), how much (annual
+    allowable cut), what is cut, and what it yields (merchantable oven-dry tonnes).
+URL: https://github.com/PredictiveEcology/timberSupply
+BugReports: https://github.com/PredictiveEcology/timberSupply/issues
+Version: 0.0.0.9000
+Authors@R:
+    person("Eliot", "McIntire", email = "eliotmcintire@gmail.com", role = c("aut", "cre"))
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

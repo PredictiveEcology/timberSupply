@@ -1,0 +1,19 @@
+## Thin caller -- the matrix, system dependencies, caching, Drive staging
+## and the check itself all live in PredictiveEcology/actions. This file only
+## says which package to check and what it needs on top of the org defaults.
+##
+## Pinned @main deliberately: tags freeze and rot (v0.1/v0.2 kept the
+## ubuntugis PPA for months after the workflows rejected it). The actions repo
+## gates merges with its own self-test CI.
+
+name: R-CMD-check
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+
+jobs:
+  R-CMD-check:
+    uses: PredictiveEcology/actions/.github/workflows/R-CMD-check.yaml@main
