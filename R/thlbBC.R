@@ -102,7 +102,8 @@ thlbOfficialBC <- function(rasterToMatch, units, destinationPath, fineFactor = 1
 thlbDerivedB <- function(rasterToMatch, yieldTablesCumulative, yieldTablesId,
                          age = 160L, minB = 6000) {
   yt <- data.table::as.data.table(yieldTablesCumulative)
-  bAtAge <- yt[yt$age == age, list(B = sum(biomass)), by = "yieldTableIndex"]
+  atAge <- age  # inside yt[...], `age` is the column, not this argument
+  bAtAge <- yt[yt$age == atAge, list(B = sum(biomass)), by = "yieldTableIndex"]
   pix <- data.table::as.data.table(yieldTablesId)[bAtAge, on = "yieldTableIndex", nomatch = 0]
   out <- terra::rast(rasterToMatch)
   out[] <- NA_real_

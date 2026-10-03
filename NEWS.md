@@ -9,3 +9,5 @@
   * Rotation, annual allowable cut and cut cohorts: `rotationAgeMap()`, `hanzlikTarget()`,
     `cutCohorts()` (from simpleHarvestPlanning).
   * Merchantable oven-dry tonnes: `merchODT()` (from a CBMutils branch; needs CBMutils).
+* `thlbDerivedB()` now reads the yield curve at `age`. In the thlbBC module it summed
+  biomass over all ages, because `age` inside `yt[...]` was the column, not the argument.

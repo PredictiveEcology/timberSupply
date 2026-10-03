@@ -1,6 +1,19 @@
 ## thlbDerivedB(), greenupShareAt(), greenupAge() and classRotation() on toy yield curves
 ## (see toyYieldTables(): curve 1 grows linearly to 10000 g/m2 at age 100, curve 2 to 4000).
 
+test_that("thlbDerivedB: 1 where the curve reaches minB by age, 0 where not, NA with no curve", {
+  L <- toyLandscape()
+  Y <- toyYieldTables(nPix = 12)
+  out <- thlbDerivedB(L$rasterToMatch, Y$yieldTablesCumulative, Y$yieldTablesId)
+  ## at 160: curve 1 = 10000, curve 2 = 4000; minB 6000
+  expect_identical(terra::values(out)[, 1], c(rep(1, 8), rep(0, 4), rep(NA, 4)))
+  ## at age 60 curve 1 is 6000: just reaches minB
+  out60 <- thlbDerivedB(L$rasterToMatch, Y$yieldTablesCumulative, Y$yieldTablesId, age = 60L)
+  expect_identical(terra::values(out60)[1:9, 1], c(rep(1, 8), 0))
+  out50 <- thlbDerivedB(L$rasterToMatch, Y$yieldTablesCumulative, Y$yieldTablesId, age = 50L)
+  expect_identical(unname(terra::values(out50)[1, 1]), 0)
+})
+
 test_that("greenupShareAt interpolates, and holds the ends outside the table", {
   gs <- c(`3` = 0.345, `5` = 0.465, `6` = 0.49, `8.5` = 0.58)
   expect_equal(greenupShareAt(5, gs), 0.465)
