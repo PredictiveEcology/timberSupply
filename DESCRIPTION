@@ -13,6 +13,24 @@ Authors@R:
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    data.table,
+    LandR,
+    reproducible (>= 3.2.1.9061),
+    stats,
+    terra,
+    utils
 Suggests:
-    testthat (>= 3.0.0)
+    bcdata,
+    CBMutils (>= 2.5.6.9006),
+    sf,
+    testthat (>= 3.0.0),
+    withr
+Remotes:
+    PredictiveEcology/CBMutils@development,
+    PredictiveEcology/LandR@development,
+    PredictiveEcology/reproducible@development
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
