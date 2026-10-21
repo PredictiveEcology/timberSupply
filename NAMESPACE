@@ -2,6 +2,7 @@
 
 export(bcAdminPolys)
 export(bcLayer)
+export(bcManagementUnit)
 export(classRotation)
 export(cutCohorts)
 export(greenupAge)

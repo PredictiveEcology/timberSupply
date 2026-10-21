@@ -42,3 +42,10 @@ test_that("classRotation: median green-up age in the zone over p; NA with none",
   zone[] <- c(rep(NA, 8), rep(1, 8))                    # only pixels with no green-up age
   expect_identical(classRotation(zone, ag, 0.2), NA_real_)
 })
+
+test_that("thlbDerivedB: yield tables that stop before age are an error", {
+  L <- toyLandscape()
+  Y <- toyYieldTables()
+  expect_error(thlbDerivedB(L$rasterToMatch, Y$yieldTablesCumulative, Y$yieldTablesId, age = 250L),
+               "stop at age 200, before `age` = 250")
+})

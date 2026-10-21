@@ -46,6 +46,44 @@ bcAdminPolys <- function(rasterToMatch, layer = c("TSA", "TFL")) {
   terra::project(v, terra::crs(rasterToMatch))
 }
 
+#' A BC Timber Supply Area or Tree Farm Licence as a study area
+#'
+#' Fetches one management unit's outline from the BC Data Catalogue. A Timber Supply Area
+#' (TSA) outline includes the Tree Farm Licences (TFLs) inside it, which have their own
+#' allowable cut, so these are erased: TSAs and TFLs then cover BC once. Retired TFL
+#' polygons are left out. Needs the `bcdata` and `sf` packages.
+#'
+#' @param unit `"TSA"` or `"TFL"` followed by its number, e.g. `"TSA24"`, `"TFL48"`.
+#' @param crs coordinate reference system of the result.
+#'
+#' @return `SpatVector` with one (multi)polygon.
+#'
+#' @export
+bcManagementUnit <- function(unit, crs = "EPSG:3005") {
+  needPkgs(c("bcdata", "sf"), "bcManagementUnit")
+  if (!grepl("^(TSA|TFL)[0-9]+$", unit))
+    stop("unit must be 'TSA' or 'TFL' followed by its number, e.g. 'TSA24' or 'TFL48'; got '", unit, "'")
+  tflRecord <- "WHSE_ADMIN_BOUNDARIES.FADM_TFL"
+  if (startsWith(unit, "TSA")) {
+    num <- sub("^TSA", "", unit)
+    v <- bcdata::bcdc_query_geodata("dab3daa4-d502-4b95-b39e-5f746a1041ed") |>  # TSA "View"
+      bcdata::filter(TSA_NUMBER == num) |>
+      bcdata::collect()
+  } else {
+    v <- bcdata::bcdc_query_geodata(tflRecord) |>
+      bcdata::filter(FOREST_FILE_ID == unit) |>
+      bcdata::collect()
+    v <- v[is.na(v$RETIREMENT_DATE), ]
+  }
+  if (nrow(v) == 0) stop("no BC management unit '", unit, "' in the BC Data Catalogue")
+  out <- terra::aggregate(terra::vect(v))
+  if (startsWith(unit, "TSA")) {
+    tfl <- bcdata::bcdc_query_geodata(tflRecord) |> bcdata::collect()
+    out <- terra::erase(out, terra::aggregate(terra::vect(tfl[is.na(tfl$RETIREMENT_DATE), ])))
+  }
+  terra::project(out, crs)
+}
+
 #' Official BC THLB fraction on a raster grid
 #'
 #' Downloads the published THLB geodatabase of each unit (from [thlbBaseURL]) and turns
@@ -102,6 +140,9 @@ thlbOfficialBC <- function(rasterToMatch, units, destinationPath, fineFactor = 1
 thlbDerivedB <- function(rasterToMatch, yieldTablesCumulative, yieldTablesId,
                          age = 160L, minB = 6000) {
   yt <- data.table::as.data.table(yieldTablesCumulative)
+  if (max(yt$age) < age)
+    stop("The yield tables stop at age ", max(yt$age), ", before `age` = ", age, ". Make them reach ",
+         age, " (e.g. Biomass_yieldTables' maxAge) or lower `age`.")
   atAge <- age  # inside yt[...], `age` is the column, not this argument
   bAtAge <- yt[yt$age == atAge, list(B = sum(biomass)), by = "yieldTableIndex"]
   pix <- data.table::as.data.table(yieldTablesId)[bAtAge, on = "yieldTableIndex", nomatch = 0]

@@ -1,3 +1,11 @@
+# timberSupply 0.0.0.9001
+
+* `thlbDerivedB()` (and so `thlbBC()`) stops with a clear message when the yield tables end
+  before `age`. It used to treat every pixel as having no curve at that age.
+* New `bcManagementUnit()`: one BC Timber Supply Area (without the Tree Farm Licences inside it)
+  or Tree Farm Licence, fetched from the BC Data Catalogue, for use as a study area.
+* Needs reproducible >= 3.2.1.9065, which downloads BC's THLB geodatabases correctly.
+
 # timberSupply 0.0.0.9000
 
 * First functions, moved from where they were written so modules can share them:
