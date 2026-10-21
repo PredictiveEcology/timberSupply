@@ -64,21 +64,23 @@ bcManagementUnit <- function(unit, crs = "EPSG:3005") {
   if (!grepl("^(TSA|TFL)[0-9]+$", unit))
     stop("unit must be 'TSA' or 'TFL' followed by its number, e.g. 'TSA24' or 'TFL48'; got '", unit, "'")
   tflRecord <- "WHSE_ADMIN_BOUNDARIES.FADM_TFL"
-  activeTFL <- function(v) terra::vect(v[is.na(v$RETIREMENT_DATE), ])
   if (startsWith(unit, "TSA")) {
     num <- sub("^TSA", "", unit)
     v <- bcdata::bcdc_query_geodata("dab3daa4-d502-4b95-b39e-5f746a1041ed") |>  # TSA "View"
       bcdata::filter(TSA_NUMBER == num) |>
       bcdata::collect()
-    tfl <- bcdata::bcdc_query_geodata(tflRecord) |> bcdata::collect()
-    out <- terra::erase(terra::aggregate(terra::vect(v)), terra::aggregate(activeTFL(tfl)))
   } else {
     v <- bcdata::bcdc_query_geodata(tflRecord) |>
       bcdata::filter(FOREST_FILE_ID == unit) |>
       bcdata::collect()
-    out <- terra::aggregate(activeTFL(v))
+    v <- v[is.na(v$RETIREMENT_DATE), ]
   }
-  if (nrow(out) == 0) stop("no BC management unit '", unit, "' in the BC Data Catalogue")
+  if (nrow(v) == 0) stop("no BC management unit '", unit, "' in the BC Data Catalogue")
+  out <- terra::aggregate(terra::vect(v))
+  if (startsWith(unit, "TSA")) {
+    tfl <- bcdata::bcdc_query_geodata(tflRecord) |> bcdata::collect()
+    out <- terra::erase(out, terra::aggregate(terra::vect(tfl[is.na(tfl$RETIREMENT_DATE), ])))
+  }
   terra::project(out, crs)
 }
 
