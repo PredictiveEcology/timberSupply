@@ -62,3 +62,15 @@ test_that("thlbOfficialBC and thlbBC: a THLB of 1/NA on the grid", {
   expect_true(terra::compareGeom(thlb, rtm))
   expect_true(all(terra::values(thlb)[, 1] %in% c(1, NA)))
 })
+
+test_that("bcManagementUnit: a TSA without its TFLs, and a TFL", {
+  skipUnlessBC()
+  tsa <- bcManagementUnit("TSA23", crs = "EPSG:3978")
+  expect_s4_class(tsa, "SpatVector")
+  expect_identical(nrow(tsa), 1)
+  expect_true(terra::same.crs(tsa, "EPSG:3978"))
+  tfl <- bcManagementUnit("TFL48")
+  expect_identical(nrow(tfl), 1)
+  expect_error(bcManagementUnit("TSA9999"), "no BC management unit")
+  expect_error(bcManagementUnit("24"), "followed by its number")
+})

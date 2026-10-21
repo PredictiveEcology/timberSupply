@@ -7,7 +7,7 @@ Description: Tools for the questions a Timber Supply Review asks of a LandR
     allowable cut), what is cut, and what it yields (merchantable oven-dry tonnes).
 URL: https://github.com/PredictiveEcology/timberSupply
 BugReports: https://github.com/PredictiveEcology/timberSupply/issues
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R:
     person("Eliot", "McIntire", email = "eliotmcintire@gmail.com", role = c("aut", "cre"))
 License: GPL-3
@@ -18,7 +18,7 @@ Depends:
 Imports:
     data.table,
     LandR,
-    reproducible (>= 3.2.1.9061),
+    reproducible (>= 3.2.1.9065),
     stats,
     terra,
     utils
