@@ -1,3 +1,8 @@
+# timberSupply (development version)
+
+* New `bcManagementUnits()`: every BC Timber Supply Area and Tree Farm Licence as one map, with the names `bcManagementUnit()` takes.
+* `bcManagementUnit()` finds TSAs written without a leading zero ("TSA1"); it found only "TSA01".
+
 # timberSupply 0.0.0.9001
 
 * `thlbDerivedB()` (and so `thlbBC()`) stops with a clear message when the yield tables end

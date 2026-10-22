@@ -3,6 +3,7 @@
 export(bcAdminPolys)
 export(bcLayer)
 export(bcManagementUnit)
+export(bcManagementUnits)
 export(classRotation)
 export(cutCohorts)
 export(greenupAge)
