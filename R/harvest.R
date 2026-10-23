@@ -77,6 +77,40 @@ rotationAgeMap <- function(spatialConstraints, template, rotationAge) {
   terra::mask(terra::cover(longest, out), max(spatialConstraints))  # any NA layer: no harvest
 }
 
+#' Harvest constraints as categories, for maps
+#'
+#' Turns each constraint layer, and all of them together, into a categorical map with
+#' "No harvest" and one category per rotation age. Where a constraint does not apply is `NA`,
+#' so a map leaves it blank.
+#'
+#' @inheritParams rotationAgeMap
+#' @param template `SpatRaster` on the same grid; its non-`NA` pixels are the study area.
+#'   "No harvest" is only marked inside it.
+#'
+#' @return A factor `SpatRaster`, one layer per constraint and a last layer `all`: what
+#'   applies where constraints overlap, as in [rotationAgeMap()]. Codes are small integers,
+#'   so it can be written with `datatype = "INT1U"`.
+#'
+#' @export
+constraintCategories <- function(spatialConstraints, template) {
+  inArea <- !is.na(terra::values(template, mat = FALSE))
+  all <- rotationAgeMap(spatialConstraints, template, 0)
+  out <- terra::rast(lapply(c(as.list(spatialConstraints), list(all)), function(x) {
+    v <- terra::values(x, mat = FALSE)
+    rotation <- !is.na(v) & v > 0
+    ages <- sort(unique(round(v[rotation])))
+    code <- rep(NA_integer_, length(v))
+    code[inArea & is.na(v)] <- 1L
+    code[rotation] <- match(round(v[rotation]), ages) + 1L
+    r <- terra::setValues(terra::rast(template, nlyrs = 1), code)
+    levels(r) <- data.frame(value = seq_len(length(ages) + 1),
+                            label = c("No harvest", sprintf("%g yr rotation", ages)))
+    r
+  }))
+  names(out) <- c(names(spatialConstraints), "all")
+  out
+}
+
 #' The cohorts removed by a harvest
 #'
 #' In each pixel, the cohorts of the species set to 1 in `speciesHarvestMaps`, aged
