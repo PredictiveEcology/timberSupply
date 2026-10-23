@@ -73,4 +73,19 @@ test_that("bcManagementUnit: a TSA without its TFLs, and a TFL", {
   expect_identical(nrow(tfl), 1)
   expect_error(bcManagementUnit("TSA9999"), "no BC management unit")
   expect_error(bcManagementUnit("24"), "followed by its number")
+  expect_identical(nrow(bcManagementUnit("TSA1")), 1)  # stored as "01"
+})
+
+test_that("bcManagementUnits: every TSA and TFL once, named as bcManagementUnit() takes them", {
+  skipUnlessBC()
+  u <- bcManagementUnits()
+  expect_s4_class(u, "SpatVector")
+  expect_false(anyDuplicated(u$unit) > 0)
+  expect_true(all(c("TSA24", "TSA1", "TFL48") %in% u$unit))
+  expect_setequal(unique(u$type), c("TSA", "TFL"))
+  expect_identical(u$name[u$unit == "TSA24"], "Prince George TSA")
+  ## TSAs and TFLs do not overlap: TFLs are erased from TSAs
+  tsa24 <- u[u$unit == "TSA24"]
+  ov <- suppressWarnings(terra::intersect(tsa24, u[u$type == "TFL"]))  # warns when empty
+  expect_lt(sum(terra::expanse(ov)), 1e4)  # m2: no more than slivers
 })

@@ -1,5 +1,7 @@
 # timberSupply (development version)
 
+* New `bcManagementUnits()`: every BC Timber Supply Area and Tree Farm Licence as one map, with the names `bcManagementUnit()` takes.
+* `bcManagementUnit()` finds TSAs written without a leading zero ("TSA1"); it found only "TSA01".
 * New `constraintCategories()`: harvest constraints as category maps ("No harvest", "150 yr rotation", ...) for display, one per constraint and one combined; where a constraint does not apply is blank.
 
 # timberSupply 0.0.0.9001

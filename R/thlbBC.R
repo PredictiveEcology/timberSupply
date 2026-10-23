@@ -46,6 +46,10 @@ bcAdminPolys <- function(rasterToMatch, layer = c("TSA", "TFL")) {
   terra::project(v, terra::crs(rasterToMatch))
 }
 
+## BC Data Catalogue records: TSA outlines ("View") and TFL outlines
+tsaRecord <- "dab3daa4-d502-4b95-b39e-5f746a1041ed"
+tflRecord <- "WHSE_ADMIN_BOUNDARIES.FADM_TFL"
+
 #' A BC Timber Supply Area or Tree Farm Licence as a study area
 #'
 #' Fetches one management unit's outline from the BC Data Catalogue. A Timber Supply Area
@@ -63,10 +67,9 @@ bcManagementUnit <- function(unit, crs = "EPSG:3005") {
   needPkgs(c("bcdata", "sf"), "bcManagementUnit")
   if (!grepl("^(TSA|TFL)[0-9]+$", unit))
     stop("unit must be 'TSA' or 'TFL' followed by its number, e.g. 'TSA24' or 'TFL48'; got '", unit, "'")
-  tflRecord <- "WHSE_ADMIN_BOUNDARIES.FADM_TFL"
   if (startsWith(unit, "TSA")) {
-    num <- sub("^TSA", "", unit)
-    v <- bcdata::bcdc_query_geodata("dab3daa4-d502-4b95-b39e-5f746a1041ed") |>  # TSA "View"
+    num <- sprintf("%02d", as.integer(sub("^TSA", "", unit)))  # stored as "01", "24"
+    v <- bcdata::bcdc_query_geodata(tsaRecord) |>
       bcdata::filter(TSA_NUMBER == num) |>
       bcdata::collect()
   } else {
@@ -81,6 +84,36 @@ bcManagementUnit <- function(unit, crs = "EPSG:3005") {
     tfl <- bcdata::bcdc_query_geodata(tflRecord) |> bcdata::collect()
     out <- terra::erase(out, terra::aggregate(terra::vect(tfl[is.na(tfl$RETIREMENT_DATE), ])))
   }
+  terra::project(out, crs)
+}
+
+#' All BC Timber Supply Areas and Tree Farm Licences
+#'
+#' Fetches every TSA and active TFL outline from the BC Data Catalogue, as one map. As in
+#' [bcManagementUnit()], TSAs have the TFLs inside them erased, so the units cover BC once.
+#' Needs the `bcdata` and `sf` packages.
+#'
+#' @inheritParams bcManagementUnit
+#'
+#' @return `SpatVector`, one (multi)polygon per unit, with columns `unit` (the name
+#'   [bcManagementUnit()] takes, e.g. `"TSA24"`, `"TFL48"`), `type` (`"TSA"` or `"TFL"`) and
+#'   `name` (e.g. `"Prince George TSA"`; the unit for TFLs).
+#'
+#' @export
+bcManagementUnits <- function(crs = "EPSG:3005") {
+  needPkgs(c("bcdata", "sf"), "bcManagementUnits")
+  tsa <- bcdata::bcdc_query_geodata(tsaRecord) |> bcdata::collect()
+  tfl <- bcdata::bcdc_query_geodata(tflRecord) |> bcdata::collect()
+  tfl <- terra::vect(tfl[is.na(tfl$RETIREMENT_DATE), ])
+  tsa <- terra::vect(tsa)
+  tsa$unit <- paste0("TSA", as.integer(tsa$TSA_NUMBER))
+  tfl$unit <- tfl$FOREST_FILE_ID
+  names <- c(stats::setNames(tsa$TSA_NUMBER_DESCRIPTION, tsa$unit),
+             stats::setNames(unique(tfl$unit), unique(tfl$unit)))
+  tsa <- terra::erase(terra::aggregate(tsa, by = "unit"), terra::aggregate(tfl))
+  out <- rbind(tsa[, "unit"], terra::aggregate(tfl, by = "unit")[, "unit"])
+  out$type <- sub("[0-9]+$", "", out$unit)
+  out$name <- unname(names[out$unit])
   terra::project(out, crs)
 }
 
