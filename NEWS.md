@@ -2,7 +2,7 @@
 
 ## Dependency changes
 
-* timberSupply now needs R >= 4.4 (was 4.1.0), the oldest R version its checks run on (#5).
+* timberSupply now needs R >= 4.5 (was 4.1.0), the oldest R version its checks run on (#5).
 
 * New `bcManagementUnits()`: every BC Timber Supply Area and Tree Farm Licence as one map, with the names `bcManagementUnit()` takes.
 * `bcManagementUnit()` finds TSAs written without a leading zero ("TSA1"); it found only "TSA01".
