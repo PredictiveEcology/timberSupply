@@ -8,7 +8,7 @@ NULL
 globalVariables(c(
   ".", ".rowID", "age", "B", "biomass", "canfi_species", "ecozone", "i.ecozone", "i.juris_id",
   "juris_id", "maxB", "merchODT", "pixelGroup", "pixelIndex", "planningArea", "speciesCode",
-  "FOREST_FILE_ID", "TSA_NUMBER"
+  "FOREST_FILE_ID", "TSA_NUMBER", "cover", "ecoregionGroup", "Provenance"
 ))
 
 ## Stop with a clear message if a Suggested package is missing.
