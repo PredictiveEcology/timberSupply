@@ -73,3 +73,33 @@ test_that("plantHistoricHarvest falls back on the historicHarvest module's param
   expect_identical(as.character(cd$speciesCode), "Pice_mar")
   expect_identical(unique(cd$B), 25)
 })
+
+test_that("without speciesLayers, SCANFI is loaded for the snapshot after the harvest year, with the module's settings", {
+  withr::local_options(reproducible.cachePath = withr::local_tempdir(), reproducible.useCache = TRUE)
+  seen <- NULL
+  testthat::local_mocked_bindings(
+    prepSpeciesLayers_SCANFI = function(...) { seen <<- list(...); toySpeciesLayers() },
+    .package = "LandR"
+  )
+  sim <- toySim(2001, cut = 12, params = list(sppEquivCol = "SCANFI", .studyAreaName = "toyArea"))
+  sim <- plantHistoricHarvest(sim)
+  expect_identical(seen$dataYear, 2005L)
+  expect_identical(seen$sppEquivCol, "SCANFI")
+  expect_identical(seen$studyAreaName, "toyArea")
+  expect_identical(seen$thresh, 10)
+  expect_identical(sort(as.character(sim$cohortData$speciesCode[sim$cohortData$planted %in% TRUE])),
+                   c("Betu_pap", "Pice_mar"))
+})
+
+test_that("without speciesLayers or module settings the package defaults are used", {
+  withr::local_options(reproducible.cachePath = withr::local_tempdir())
+  seen <- NULL
+  testthat::local_mocked_bindings(
+    prepSpeciesLayers_SCANFI = function(...) { seen <<- list(...); toySpeciesLayers() },
+    .package = "LandR"
+  )
+  sim <- plantHistoricHarvest(toySim(2001, cut = 12))
+  expect_identical(seen$sppEquivCol, "LandR")
+  expect_true(is.na(seen$studyAreaName))
+  expect_true(all(sim$cohortData$B[sim$cohortData$planted %in% TRUE] == 10))
+})
