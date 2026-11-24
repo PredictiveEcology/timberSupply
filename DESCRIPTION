@@ -17,8 +17,10 @@ Depends:
     R (>= 4.1.0)
 Imports:
     data.table,
-    LandR,
+    LandR (>= 1.2.0.9066),
+    pemisc,
     reproducible (>= 3.2.1.9065),
+    SpaDES.core,
     stats,
     terra,
     utils
@@ -30,7 +32,9 @@ Suggests:
     withr
 Remotes:
     PredictiveEcology/CBMutils@development,
-    PredictiveEcology/LandR@development,
-    PredictiveEcology/reproducible@development
+    PredictiveEcology/LandR@modsForFireSense,
+    PredictiveEcology/pemisc@development,
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.core@development
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
