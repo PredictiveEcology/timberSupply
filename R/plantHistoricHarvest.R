@@ -77,10 +77,15 @@ historicHarvestPlantingTable <- function(cutPixels, speciesLayers, ecoregionMap,
 #'
 #' @export
 plantHistoricHarvest <- function(sim, speciesLayers = NULL,
-                                 minCoverThreshold = modulePar(sim, "minCoverThreshold", 5),
-                                 sppEquivCol = modulePar(sim, "sppEquivCol", "LandR"),
-                                 initialB = modulePar(sim, "initialB", 10),
-                                 studyAreaName = modulePar(sim, ".studyAreaName", NA_character_)) {
+                                 minCoverThreshold = SpaDES.core::P(sim, "minCoverThreshold", "historicHarvest"),
+                                 sppEquivCol = SpaDES.core::P(sim, "sppEquivCol", "historicHarvest"),
+                                 initialB = SpaDES.core::P(sim, "initialB", "historicHarvest"),
+                                 studyAreaName = SpaDES.core::P(sim, ".studyAreaName", "historicHarvest")) {
+  ## the module's value if `sim` holds that module and sets the parameter, else the default
+  if (is.null(minCoverThreshold)) minCoverThreshold <- 5
+  if (is.null(sppEquivCol)) sppEquivCol <- "LandR"
+  if (is.null(initialB)) initialB <- 10
+  if (is.null(studyAreaName)) studyAreaName <- NA_character_
   yr <- stats::time(sim)
 
   cutPixels <- which(as.vector(terra::values(sim$rstCurrentHarvest)) == 1)
@@ -121,10 +126,4 @@ plantHistoricHarvest <- function(sim, speciesLayers = NULL,
           data.table::uniqueN(newPixelCohortData$pixelIndex), " of ", NROW(treedHarvestPixelTable),
           " cut pixels (SCANFI ", scanfiSnapshotYear(yr), ")")
   sim
-}
-
-## A setting of the `historicHarvest` module held in `sim`, else `default`
-modulePar <- function(sim, name, default) {
-  p <- sim@params[["historicHarvest"]][[name]]
-  if (is.null(p)) default else p
 }

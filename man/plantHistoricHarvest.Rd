@@ -7,10 +7,10 @@
 plantHistoricHarvest(
   sim,
   speciesLayers = NULL,
-  minCoverThreshold = modulePar(sim, "minCoverThreshold", 5),
-  sppEquivCol = modulePar(sim, "sppEquivCol", "LandR"),
-  initialB = modulePar(sim, "initialB", 10),
-  studyAreaName = modulePar(sim, ".studyAreaName", NA_character_)
+  minCoverThreshold = SpaDES.core::P(sim, "minCoverThreshold", "historicHarvest"),
+  sppEquivCol = SpaDES.core::P(sim, "sppEquivCol", "historicHarvest"),
+  initialB = SpaDES.core::P(sim, "initialB", "historicHarvest"),
+  studyAreaName = SpaDES.core::P(sim, ".studyAreaName", "historicHarvest")
 )
 }
 \arguments{

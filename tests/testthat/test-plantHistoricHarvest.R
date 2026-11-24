@@ -67,8 +67,7 @@ test_that("plantHistoricHarvest takes sim first and its settings as arguments, f
 })
 
 test_that("plantHistoricHarvest falls back on the historicHarvest module's parameters in the simList", {
-  sim <- toySim(2001, cut = 12)
-  sim@params$historicHarvest <- list(minCoverThreshold = 40, initialB = 25)
+  sim <- toySim(2001, cut = 12, params = list(minCoverThreshold = 40, initialB = 25))
   sim <- plantHistoricHarvest(sim, speciesLayers = toySpeciesLayers())
   cd <- sim$cohortData[planted %in% TRUE]
   expect_identical(as.character(cd$speciesCode), "Pice_mar")

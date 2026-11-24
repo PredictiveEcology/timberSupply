@@ -59,13 +59,20 @@ toySpeciesLayers <- function(overrides = list()) {
   out
 }
 
-## A simList at `year` holding the toy objects, with `cut` (cell numbers) in rstCurrentHarvest
-toySim <- function(year, cut = integer(0)) {
+## A simList at `year` holding the toy objects, with `cut` (cell numbers) in rstCurrentHarvest.
+## It holds an empty module named historicHarvest, as P() needs a module; `params` are set on it.
+toySim <- function(year, cut = integer(0), params = list()) {
   rst <- toyRTM(); rst[!is.na(rst)] <- 0; rst[cut] <- 1
-  withr::local_options(list(reproducible.verbose = -2, reproducible.useCloud = FALSE),
+  modPath <- file.path(tempdir(), "toyModules")
+  if (!dir.exists(file.path(modPath, "historicHarvest")))
+    suppressMessages(SpaDES.core::newModule("historicHarvest", modPath, open = FALSE))
+  withr::local_options(list(reproducible.verbose = -2, reproducible.useCloud = FALSE,
+                            spades.moduleCodeChecks = FALSE, spades.useRequire = FALSE),
                        .local_envir = parent.frame())
   suppressMessages(SpaDES.core::simInit(
-    times = list(start = year, end = year),
+    times = list(start = year, end = year), modules = "historicHarvest",
+    paths = list(modulePath = modPath),
+    params = list(historicHarvest = params),
     objects = list(rasterToMatch = toyRTM(), sppEquiv = toySppEquiv(), cohortData = toyCohortData(),
                    pixelGroupMap = toyPixelGroupMap(), ecoregionMap = toyEcoregionMap(),
                    speciesEcoregion = toySpeciesEcoregion(), rstCurrentHarvest = rst)
